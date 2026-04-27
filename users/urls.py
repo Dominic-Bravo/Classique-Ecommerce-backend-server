@@ -9,4 +9,5 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view()),
     
     path('psid-login/', PSIDLoginView.as_view()),
+    
 ]
