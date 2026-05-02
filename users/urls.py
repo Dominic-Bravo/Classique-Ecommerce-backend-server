@@ -12,7 +12,7 @@ urlpatterns = [
     
     path('psid-login/', PSIDLoginView.as_view()),
     
-    path('api/auth/google/', GoogleLogin.as_view(), name='google_login'),
-    path('api/auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
+    path('auth/google/', GoogleLogin.as_view(), name='google_login'),
+    path('auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
     
 ]
