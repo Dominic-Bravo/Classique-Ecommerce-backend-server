@@ -77,24 +77,41 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
+# Tell allauth to trust email addresses from these providers
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Ensure social data is actually saved
+SOCIALACCOUNT_STORE_TOKENS = True
+
+
+
+# Allauth settings for email-based authentication
+# Replace your old ACCOUNT_ settings with these:
+ACCOUNT_LOGIN_METHODS = {'email'}
+
+# Note: 'email*' in SIGNUP_FIELDS tells allauth it's required.
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+# This allows linking social accounts to existing users with the same email
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+
 # Facebook-specific settings
 SOCIALACCOUNT_PROVIDERS = {
-    'facebook': {
+        'facebook': {
         'METHOD': 'oauth2',
         'SCOPE': ['email', 'public_profile'],
         'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
         'FIELDS': [
-            'id',
-            'email',
-            'name',
-            'first_name',
-            'last_name',
-            'verified',
+            'id', 'email', 'name', 'first_name', 'last_name', 'verified',
         ],
         'EXCHANGE_TOKEN': True,
         'VERIFIED_EMAIL': False,
-        'VERSION': 'v13.0',
-    }   
+        'VERSION': 'v18.0', # Updated version
+    },
 }
 
 # Use JWT for modern stateless APIs

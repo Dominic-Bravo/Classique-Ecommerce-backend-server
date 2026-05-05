@@ -1,6 +1,6 @@
 # apps/users/urls.py
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.urls import path
+from django.urls import include, path
 
 
 from users.views import FacebookLogin, GoogleLogin, PSIDLoginView, RegisterView
@@ -12,6 +12,7 @@ urlpatterns = [
     
     path('psid-login/', PSIDLoginView.as_view()),
     
+    path('accounts/', include('allauth.urls')),
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),
     path('auth/facebook/', FacebookLogin.as_view(), name='fb_login'),
     
