@@ -41,14 +41,6 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://localhost:3000/google-callback"
     client_class = OAuth2Client
-
-    def post(self, request, *args, **kwargs):
-        res = super().post(request, *args, **kwargs)
-        # Check if the user has social accounts linked after the logic runs
-        from allauth.socialaccount.models import SocialAccount
-        social_data = SocialAccount.objects.filter(user=request.user)
-        print(f"LOG: Social accounts found for this user: {social_data.count()}")
-        return res
     
 
 class FacebookLogin(SocialLoginView):
