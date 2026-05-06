@@ -9,6 +9,8 @@ urlpatterns = [
     path('register/', RegisterView.as_view()),
     path('login/', TokenObtainPairView.as_view()),
     path('refresh/', TokenRefreshView.as_view()),
+    path('auth/', include('dj_rest_auth.urls')),
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),
     
     path('psid-login/', PSIDLoginView.as_view()),
     

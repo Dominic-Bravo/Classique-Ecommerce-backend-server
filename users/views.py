@@ -1,6 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
 # apps/users/views.py
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
@@ -18,6 +15,8 @@ class RegisterView(CreateAPIView):
 
 
 class PSIDLoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         psid = request.data.get("psid")
 
@@ -29,7 +28,6 @@ class PSIDLoginView(APIView):
 
         return Response(tokens)
     
-from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 

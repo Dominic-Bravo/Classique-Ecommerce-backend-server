@@ -1,7 +1,5 @@
-from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework import generics
+from users.permissions import IsOwnerRoleOrReadOnly
 
 from .models import Category, Product
 from .serializers import (
@@ -14,9 +12,9 @@ from .services import CategoryService, ProductService
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     """List all categories or create a new category."""
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerRoleOrReadOnly]
 
     def perform_create(self, serializer):
         CategoryService.create_category(serializer.validated_data)
@@ -24,9 +22,9 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update, or delete a category."""
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerRoleOrReadOnly]
 
     def perform_update(self, serializer):
         category = self.get_object()
@@ -38,8 +36,8 @@ class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class ProductListCreateView(generics.ListCreateAPIView):
     """List all products or create a new product."""
-    queryset = Product.objects.select_related('category').all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Product.objects.select_related('category').all().order_by('id')
+    permission_classes = [IsOwnerRoleOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -52,8 +50,8 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update, or delete a product."""
-    queryset = Product.objects.select_related('category').all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Product.objects.select_related('category').all().order_by('id')
+    permission_classes = [IsOwnerRoleOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:

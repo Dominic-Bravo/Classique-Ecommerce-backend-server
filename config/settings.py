@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # include alauth and rest auth
     'django.contrib.sites',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'dj_rest_auth',
     'dj_rest_auth.registration', # Enable registration
     
@@ -70,6 +71,7 @@ REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'jwt-auth',
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
+    'REGISTER_SERIALIZER': 'users.serializers.DjRestAuthRoleRegisterSerializer',
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -79,6 +81,10 @@ AUTHENTICATION_BACKENDS = [
 
 # Facebook-specific settings
 SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
         'facebook': {
         'METHOD': 'oauth2',
         'SCOPE': ['email', 'public_profile'],
@@ -92,6 +98,10 @@ SOCIALACCOUNT_PROVIDERS = {
     },
 }
 
+ACCOUNT_EMAIL_VERIFICATION = 'none' # Disable email verification for testing optional
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email', 'password1*', 'password2*']
+
 # Use JWT for modern stateless APIs
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-auth'
@@ -99,7 +109,7 @@ JWT_AUTH_COOKIE = 'my-auth'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'users.permissions.GlobalRolePermission',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
