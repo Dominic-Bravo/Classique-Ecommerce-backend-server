@@ -1,12 +1,20 @@
 # apps/users/views.py
+from django.contrib.auth import get_user_model
+from rest_framework import generics
 from rest_framework.generics import CreateAPIView
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from .serializers import RegisterSerializer
+from .serializers import (
+    PSIDLoginSerializer,
+    RegisterSerializer,
+    RoleUpdateSerializer,
+    UserSerializer,
+)
 from .services import get_or_create_user_from_psid
 from .utils import generate_tokens
+
+User = get_user_model()
 
 
 class RegisterView(CreateAPIView):
@@ -14,16 +22,30 @@ class RegisterView(CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-class PSIDLoginView(APIView):
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all().order_by('id')
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+
+
+class MyRoleUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = RoleUpdateSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'put', 'patch', 'head', 'options']
+
+    def get_object(self):
+        return self.request.user
+
+
+class PSIDLoginView(generics.GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = PSIDLoginSerializer
 
     def post(self, request):
-        psid = request.data.get("psid")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not psid:
-            return Response({"error": "PSID required"}, status=400)
-
-        user = get_or_create_user_from_psid(psid)
+        user = get_or_create_user_from_psid(serializer.validated_data["psid"])
         tokens = generate_tokens(user)
 
         return Response(tokens)

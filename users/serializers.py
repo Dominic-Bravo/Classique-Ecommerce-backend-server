@@ -5,6 +5,10 @@ from rest_framework import serializers
 User = get_user_model()
 
 
+class PSIDLoginSerializer(serializers.Serializer):
+    psid = serializers.CharField()
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
 
@@ -31,6 +35,44 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'role',
+            'owner_approval_status',
+            'psid',
+            'is_active',
+            'date_joined',
+        ]
+        read_only_fields = fields
+
+
+class RoleUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['role', 'owner_approval_status']
+        read_only_fields = ['owner_approval_status']
+
+    def update(self, instance, validated_data):
+        role = validated_data.get('role', instance.role)
+        instance.role = role
+
+        if role == User.ROLE_OWNER:
+            if instance.owner_approval_status != User.OWNER_APPROVAL_APPROVED:
+                instance.owner_approval_status = User.OWNER_APPROVAL_PENDING
+        else:
+            instance.owner_approval_status = User.OWNER_APPROVAL_NOT_REQUESTED
+
+        instance.save(update_fields=['role', 'owner_approval_status'])
+        return instance
 
 
 class DjRestAuthRoleRegisterSerializer(DjRestAuthRegisterSerializer):

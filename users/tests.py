@@ -117,3 +117,66 @@ class RegisterRoleTests(APITestCase):
 
         user = User.objects.get(username="dj-anonymous")
         self.assertEqual(user.role, User.ROLE_ANONYMOUS)
+
+
+class UserRoleEndpointTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="role-user",
+            email="role-user@example.com",
+            password="password123",
+            role=User.ROLE_ANONYMOUS,
+        )
+        self.admin = User.objects.create_superuser(
+            username="admin",
+            email="admin@example.com",
+            password="password123",
+        )
+
+    def test_authenticated_anonymous_role_user_can_change_to_customer(self):
+        self.client.force_authenticate(self.user)
+
+        response = self.client.patch(
+            "/api/users/me/role/",
+            {"role": "customer"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.role, User.ROLE_CUSTOMER)
+        self.assertEqual(
+            self.user.owner_approval_status,
+            User.OWNER_APPROVAL_NOT_REQUESTED,
+        )
+
+    def test_changing_to_owner_creates_pending_owner_request(self):
+        self.client.force_authenticate(self.user)
+
+        response = self.client.patch(
+            "/api/users/me/role/",
+            {"role": "owner"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.role, User.ROLE_OWNER)
+        self.assertEqual(self.user.owner_approval_status, User.OWNER_APPROVAL_PENDING)
+
+    def test_non_admin_cannot_list_all_users(self):
+        self.client.force_authenticate(self.user)
+
+        response = self.client.get("/api/users/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_can_list_all_users(self):
+        self.client.force_authenticate(self.admin)
+
+        response = self.client.get("/api/users/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(response.data["results"]), 2)
