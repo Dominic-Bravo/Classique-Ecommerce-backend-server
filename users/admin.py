@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import User
 
-# custom user admin
+# custom user admin 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = [
@@ -32,7 +32,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('role', 'owner_approval_status', 'psid'),
         }),
     )
-
+    # get readonly func
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(super().get_readonly_fields(request, obj))
         if not request.user.is_superuser:
