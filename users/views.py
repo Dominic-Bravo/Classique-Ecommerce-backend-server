@@ -16,7 +16,7 @@ from .utils import generate_tokens
 
 User = get_user_model()
 
-
+# register endpoint
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer

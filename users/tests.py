@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 
 User = get_user_model()
 
-
+# testing register role
 class RegisterRoleTests(APITestCase):
     def test_custom_registration_defaults_to_anonymous_without_role(self):
         response = self.client.post(
