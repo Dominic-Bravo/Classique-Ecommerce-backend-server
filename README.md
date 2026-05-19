@@ -1,3 +1,5 @@
+update in future and refactor codebase
+
 # Classique Ecommerce Backend Server
 
 Classique Ecommerce Backend Server is a Django REST API for an ecommerce app.
