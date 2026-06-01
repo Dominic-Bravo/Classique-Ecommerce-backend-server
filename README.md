@@ -1,5 +1,6 @@
 update in future and refactor codebase
 updates
+change auth socials and permissions
 
 
 # Classique Ecommerce Backend Server
